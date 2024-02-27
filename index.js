@@ -1,24 +1,8 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 const cors = require('cors')
-
-let notes = [
-  {
-    id: 1,
-    content: "HTML is easy",
-    important: true
-  },
-  {
-    id: 2,
-    content: "Browser can execute only JavaScript",
-    important: false
-  },
-  {
-    id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
-    important: true
-  }
-]
+const Note = require('./models/note')
 
 const requestLogger = (request, response, next) => {
   console.log('Method:', request.method)
@@ -38,7 +22,9 @@ const unknownEndpoint = (request, response) => {
 }
 
 app.get('/api/notes', (request, response) => {
-  response.json(notes)
+  Note.find({}).then(notes=>{
+    response.json(notes)
+  })
 })
 
 const generateId = () => {
@@ -62,7 +48,7 @@ app.post('/api/notes', (request, response) => {
     important: body.important || false,
     id: generateId(),
   }
-
+  
   notes = notes.concat(note)
   response.json(note)
 })
